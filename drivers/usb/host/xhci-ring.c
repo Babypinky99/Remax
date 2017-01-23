@@ -663,6 +663,7 @@ static void xhci_giveback_urb_in_irq(struct xhci_hcd *xhci,
 	spin_unlock(&xhci->lock);
 	trace_xhci_urb_giveback(urb);
 	usb_hcd_giveback_urb(hcd, urb, status);
+	trace_xhci_urb_giveback(urb);
 	spin_lock(&xhci->lock);
 }
 
