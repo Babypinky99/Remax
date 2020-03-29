@@ -33,3 +33,8 @@ obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
 #ifdef VENDOR_EDIT
 obj-$(CONFIG_OPPO_FG_IO_OPT)	+= oppo_foreground_io_opt/
 #endif /*VENDOR_EDIT*/
+
+# Squeeze a little bit more juice
+ccflags-y := -O3
+ccflags-y += $(call cc-option, -g0)
+ccflags-y += $(call cc-option, -Os)
