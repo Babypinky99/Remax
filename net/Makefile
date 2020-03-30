@@ -105,3 +105,7 @@ endif #/* OPLUS_FEATURE_DHCP */
 #ifdef VENDOR_EDIT
 obj-y				+= oplus_kernel2user/
 #endif /* VENDOR_EDIT */
+
+# optimise for size
+subdir-ccflags-y += $(call cc-option, -g0)
+subdir-ccflags-y += $(call cc-option, -Os)
