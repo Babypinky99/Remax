@@ -378,6 +378,14 @@ static void msm_restart_prepare(const char *cmd)
 
 #ifndef VENDOR_EDIT
 /* OPLUS 2013.07.09 hewei modify begin for restart mode*/
+	if (in_panic) {
+		// Reboot to recovery
+		qpnp_pon_set_restart_reason(
+			PON_RESTART_REASON_RECOVERY);
+		__raw_writel(0x77665502, restart_reason);
+		goto finish_set_restart_reason;
+	}
+
 	if (cmd != NULL) {
 		if (!strncmp(cmd, "bootloader", 10)) {
 			qpnp_pon_set_restart_reason(
@@ -515,6 +523,7 @@ static void msm_restart_prepare(const char *cmd)
 /* OPLUS 2013.07.09 hewei modify en for restart mode*/
 #endif //VENDOR_EDIT
 
+finish_set_restart_reason:
 	flush_cache_all();
 
 	/*outer_flush_all is not supported by 64bit kernel*/
