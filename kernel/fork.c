@@ -1794,10 +1794,6 @@ static __latent_entropy struct task_struct *copy_process(
 	p->sequential_io_avg	= 0;
 #endif
 
-#ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
-	p->fpack = NULL;
-#endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */
-
 #ifdef OPLUS_FEATURE_UIFIRST
 	init_task_ux_info(p);
 #endif /* OPLUS_FEATURE_UIFIRST */

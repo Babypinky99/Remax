@@ -2237,9 +2237,6 @@ struct task_struct {
         int camera_opt;
 #endif
 #endif /* OPLUS_FEATURE_UIFIRST */
-#ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
-	struct fuse_package *fpack;
-#endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */
 #ifdef CONFIG_ANDROID_SIMPLE_LMK
 	struct task_struct		*simple_lmk_next;
 #endif
@@ -2252,14 +2249,6 @@ struct task_struct {
  * Do not put anything below here!
  */
 };
-
-#ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
-struct fuse_package {
-	bool fuse_open_req;
-	struct file *filp;
-	char *iname;
-};
-#endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */
 
 #ifdef CONFIG_ARCH_WANTS_DYNAMIC_TASK_STRUCT
 extern int arch_task_struct_size __read_mostly;
