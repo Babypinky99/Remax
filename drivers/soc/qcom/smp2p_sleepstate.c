@@ -20,10 +20,7 @@
 
 #define SET_DELAY (2 * HZ)
 #define PROC_AWAKE_ID 12 /* 12th bit */
-#ifdef VENDOR_EDIT
-//Fei.Mo@BSP.Sensor 2018/06/25 modify for notify sensor suspend forward
 int slst_gpio_base_id;
-#endif
 
 /**
  * sleepstate_pm_notifier() - PM notifier callback function.
