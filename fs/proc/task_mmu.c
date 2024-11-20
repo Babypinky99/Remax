@@ -403,6 +403,11 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 		susfs_sus_kstat_spoof_show_map_vma(inode, &dev, &ino);
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
+        struct dentry *dentry = file->f_path.dentry;
+        if (dentry) {
+        	const char *path = (const char *)dentry->d_name.name; 
+            	if (strstr(path, "lineage")) { return; }
+            	}
 	}
 
 	/* We don't show the stack guard page in /proc/maps */
