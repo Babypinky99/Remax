@@ -1370,7 +1370,6 @@ const struct inode_operations exfat_dir_inode_operations = {
 	.rmdir         = exfat_rmdir,
 	.rename        = exfat_rename,
 	.setattr       = exfat_setattr,
-	.getattr       = exfat_getattr,
 };
 
 /*======================================================================*/
@@ -1496,7 +1495,6 @@ const struct inode_operations exfat_file_inode_operations = {
 	.truncate    = exfat_truncate,
 #endif
 	.setattr     = exfat_setattr,
-	.getattr     = exfat_getattr,
 };
 
 /*======================================================================*/
