@@ -753,7 +753,7 @@ ARCH_CFLAGS :=
 include arch/$(SRCARCH)/Makefile
 
 ifeq ($(cc-name),clang)
-OPT_FLAGS := -march=armv8.2-a+crypto+crc+nodotprod+lse+fp16
+OPT_FLAGS := -march=armv8.2-a+crypto+crc+nodotprod
 OPT_FLAGS += -mtune=cortex-a75
 ifdef CONFIG_LLVM_POLLY
 OPT_FLAGS += -mllvm -polly \
@@ -782,7 +782,7 @@ else
 OPT_FLAGS += -mllvm -polly-opt-fusion=max
 endif
 
-OPT_FLAGS += -ffp-contract=fast -mllvm -regalloc-enable-advisor=release -mllvm -hot-cold-split=true
+OPT_FLAGS += -ffp-contract=fast -mllvm -hot-cold-split=true
 
 KBUILD_CFLAGS += $(OPT_FLAGS)
 KBUILD_AFLAGS += $(OPT_FLAGS)
