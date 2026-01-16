@@ -45,9 +45,6 @@
 #include "blk-mq.h"
 
 #include <linux/math64.h>
-#if defined(OPLUS_FEATURE_UIFIRST) && defined(CONFIG_OPLUS_FEATURE_UXIO_FIRST)
-#include "uxio_first/uxio_first_opt.h"
-#endif
 
 EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_remap);
 EXPORT_TRACEPOINT_SYMBOL_GPL(block_rq_remap);
@@ -2134,11 +2131,6 @@ blk_qc_t submit_bio(struct bio *bio)
 				count);
 		}
 	}
-
-#if defined(OPLUS_FEATURE_UIFIRST) && defined(CONFIG_OPLUS_FEATURE_UXIO_FIRST)
-	if (high_prio_for_task(current))
-		bio->bi_opf |= REQ_FG;
-#endif
 
 	/*
 	 * If we're reading data that is part of the userspace

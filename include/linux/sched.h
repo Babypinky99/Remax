@@ -326,21 +326,6 @@ extern char ___assert_task_state[1 - 2*!!(
 
 #endif
 
-#ifdef OPLUS_FEATURE_UIFIRST
-extern int sysctl_uifirst_enabled;
-extern int sysctl_animation_type;
-extern int sysctl_launcher_boost_enabled;
-
-#define LAUNCHER_SI_START (4)
-#define LAUNCHER_SI_EXIT (5)
-#ifdef CONFIG_CAMERA_OPT
-extern int sysctl_camera_opt_enabled;
-#endif
-#endif /* OPLUS_FEATURE_UIFIRST */
-#ifdef VENDOR_EDIT
-extern int sysctl_slide_boost_enabled;
-extern int sysctl_boost_task_threshold;
-#endif
 /* Task command name length */
 #define TASK_COMM_LEN 16
 
@@ -2220,17 +2205,6 @@ struct task_struct {
 	/* A live task holds one reference. */
 	atomic_t stack_refcount;
 #endif
-#ifdef OPLUS_FEATURE_UIFIRST
-	int static_ux;
-	atomic64_t dynamic_ux;
-	struct list_head ux_entry;
-	int ux_depth;
-	u64 enqueue_time;
-	u64 dynamic_ux_start;
-#ifdef CONFIG_CAMERA_OPT
-        int camera_opt;
-#endif
-#endif /* OPLUS_FEATURE_UIFIRST */
 #ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
 	struct fuse_package *fpack;
 #endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */

@@ -30,13 +30,6 @@
 
 #include <trace/events/sched.h>
 
-#ifdef VENDOR_EDIT
-#include <linux/sched.h>
-extern u64 ux_task_load[];
-extern u64 ux_load_ts[];
-#define UX_LOAD_WINDOW 8000000
-#endif
-
 const char *task_event_names[] = {"PUT_PREV_TASK", "PICK_NEXT_TASK",
 				  "TASK_WAKE", "TASK_MIGRATE", "TASK_UPDATE",
 				"IRQ_UPDATE"};
@@ -583,14 +576,6 @@ u64 freq_policy_load(struct rq *rq)
 	default:
 		break;
 	}
-#ifdef VENDOR_EDIT
-	if (sysctl_uifirst_enabled && sysctl_slide_boost_enabled && ux_load_ts[cpu]) {
-		timeline = wallclock - ux_load_ts[cpu];
-		if  (timeline >= UX_LOAD_WINDOW)
-			ux_task_load[cpu] = 0;
-		load = max_t(u64, load, ux_task_load[cpu]);
-	}
-#endif
 done:
 	trace_sched_load_to_gov(rq, aggr_grp_load, tt_load, freq_aggr_thresh,
 				load, reporting_policy, walt_rotation_enabled,

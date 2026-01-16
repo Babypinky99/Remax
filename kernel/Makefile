@@ -41,10 +41,6 @@ obj-y += irq/
 obj-y += rcu/
 obj-y += livepatch/
 
-#ifdef OPLUS_FEATURE_UIFIRST
-obj-y += uifirst/
-#endif /* OPLUS_FEATURE_UIFIRST */
-
 obj-$(CONFIG_CHECKPOINT_RESTORE) += kcmp.o
 obj-$(CONFIG_FREEZER) += freezer.o
 obj-$(CONFIG_PROFILING) += profile.o

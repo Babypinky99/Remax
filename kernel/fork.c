@@ -92,9 +92,6 @@
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/task.h>
-#ifdef OPLUS_FEATURE_UIFIRST
-#include <linux/uifirst/uifirst_sched_fork.h>
-#endif /* OPLUS_FEATURE_UIFIRST */
 
 /*
  * Minimum number of threads to boot the kernel
@@ -1793,10 +1790,6 @@ static __latent_entropy struct task_struct *copy_process(
 #ifdef CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT
 	p->fpack = NULL;
 #endif /* CONFIG_OPLUS_FEATURE_FUSE_FS_SHORTCIRCUIT */
-
-#ifdef OPLUS_FEATURE_UIFIRST
-	init_task_ux_info(p);
-#endif /* OPLUS_FEATURE_UIFIRST */
 
 	/* Perform scheduler related setup. Assign this task to a CPU. */
 	retval = sched_fork(clone_flags, p);

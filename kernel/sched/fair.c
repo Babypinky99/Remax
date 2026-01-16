@@ -36,15 +36,6 @@
 #include "tune.h"
 #include "walt.h"
 #include <trace/events/sched.h>
-#ifdef OPLUS_FEATURE_UIFIRST
-#include <linux/uifirst/uifirst_sched_common.h>
-#endif /* OPLUS_FEATURE_UIFIRST */
-
-#ifdef VENDOR_EDIT
-extern unsigned int walt_scale_demand_divisor;
-bool ux_task_misfit(struct task_struct *p, int cpu);
-#define scale_demand(d) ((d)/walt_scale_demand_divisor)
-#endif
 
 #ifdef CONFIG_SCHED_WALT
 
@@ -5054,11 +5045,6 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 
 		flags = ENQUEUE_WAKEUP;
 	}
-#ifdef OPLUS_FEATURE_UIFIRST
-	if (sysctl_uifirst_enabled) {
-		enqueue_ux_thread(rq, p);
-	}
-#endif /* OPLUS_FEATURE_UIFIRST */
 
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
@@ -5155,11 +5141,6 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		}
 		flags |= DEQUEUE_SLEEP;
 	}
-#ifdef OPLUS_FEATURE_UIFIRST
-	if (sysctl_uifirst_enabled) {
-		dequeue_ux_thread(rq, p);
-	}
-#endif /* OPLUS_FEATURE_UIFIRST */
 
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
@@ -7150,20 +7131,6 @@ retry:
 			if (!cpu_online(i) || cpu_isolated(i))
 				continue;
 
-#ifdef OPLUS_FEATURE_UIFIRST
-			if (sysctl_uifirst_enabled && test_task_ux(p)) {
-				if (sysctl_launcher_boost_enabled && is_heavy_ux_task(p) && !test_ux_task_cpu(i))
-					continue;
-
-				if (!sysctl_launcher_boost_enabled || !is_heavy_ux_task(p)) {
-					if (cpu_rq(i)->rt.rt_nr_running)
-						continue;
-
-					if (!list_empty(&cpu_rq(i)->ux_thread_list))
-						continue;
-				}
-			}
-#endif /* OPLUS_FEATURE_UIFIRST */
 			isolated_candidate = i;
 
 			if (avoid_prev_cpu && i == prev_cpu)
@@ -7750,13 +7717,6 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu, int sync
 		goto out;
 	}
 
-#ifdef OPLUS_FEATURE_UIFIRST
-	if (sysctl_uifirst_enabled && sysctl_launcher_boost_enabled &&
-		is_heavy_ux_task(p) && !test_ux_prefer_cpu(p, target_cpu)) {
-		find_ux_task_cpu(p, &target_cpu);
-	}
-#endif /* OPLUS_FEATURE_UIFIRST */
-
 	schedstat_inc(p->se.statistics.nr_wakeups_secb_count);
 	schedstat_inc(this_rq()->eas_stats.secb_count);
 
@@ -8037,11 +7997,6 @@ static void check_preempt_wakeup(struct rq *rq, struct task_struct *p, int wake_
 	find_matching_se(&se, &pse);
 	update_curr(cfs_rq_of(se));
 	BUG_ON(!pse);
-#ifdef OPLUS_FEATURE_UIFIRST
-	if (sysctl_uifirst_enabled && test_task_ux(p) && !test_task_ux(curr)) {
-		goto preempt;
-	}
-#endif /* OPLUS_FEATURE_UIFIRST */
 	if (wakeup_preempt_entity(se, pse) == 1) {
 		/*
 		 * Bias pick_next to pick the sched entity that is
@@ -8126,11 +8081,6 @@ again:
 	} while (cfs_rq);
 
 	p = task_of(se);
-#ifdef OPLUS_FEATURE_UIFIRST
-	if (sysctl_uifirst_enabled) {
-		pick_ux_thread(rq, &p, &se);
-	}
-#endif /* OPLUS_FEATURE_UIFIRST */
 
 	/*
 	 * Since we haven't yet done put_prev_entity and if the selected task
@@ -8742,16 +8692,6 @@ redo:
 		if (!can_migrate_task(p, env))
 			goto next;
 
-#ifdef OPLUS_FEATURE_UIFIRST
-		if (sysctl_uifirst_enabled && test_task_ux(p)) {
-			if (sysctl_launcher_boost_enabled && is_heavy_ux_task(p) && test_ux_task_cpu(task_cpu(p)) &&
-					!test_ux_task_cpu(env->dst_cpu))
-				goto next;
-
-			if ((!sysctl_launcher_boost_enabled || is_heavy_ux_task(p)) && !list_empty(&env->dst_rq->ux_thread_list))
-				goto next;
-		}
-#endif /* OPLUS_FEATURE_UIFIRST */
 		load = task_h_load(p);
 
 		/*
@@ -12236,18 +12176,6 @@ static inline void walt_check_for_rotation(struct rq *rq)
 }
 #endif
 
-#ifdef VENDOR_EDIT
-bool ux_task_misfit(struct task_struct *p, int cpu)
-{
-	int num_mincpu = cpumask_weight(topology_core_cpumask(0));
-	if ((scale_demand(p->ravg.sum) >= sysctl_boost_task_threshold ||
-	     task_util(p) >= sysctl_boost_task_threshold) && cpu < num_mincpu)
-		return true;
-
-	return false;
-}
-#endif
-
 static DEFINE_RAW_SPINLOCK(migration_lock);
 void check_for_migration(struct rq *rq, struct task_struct *p)
 {
@@ -12255,12 +12183,7 @@ void check_for_migration(struct rq *rq, struct task_struct *p)
 	int active_balance;
 	int cpu = task_cpu(p);
 
-#ifdef VENDOR_EDIT
-	if (rq->misfit_task || (sysctl_uifirst_enabled && sysctl_slide_boost_enabled &&
-					p->static_ux == 2 && ux_task_misfit(p, cpu))) {
-#else
 	if (rq->misfit_task) {
-#endif
 		if (rq->curr->state != TASK_RUNNING ||
 		    rq->curr->nr_cpus_allowed == 1)
 			return;

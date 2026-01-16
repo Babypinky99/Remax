@@ -96,15 +96,7 @@
 #include "fd.h"
 
 #include "../../lib/kstrtox.h"
-#ifdef OPLUS_FEATURE_UIFIRST
-#define GLOBAL_SYSTEM_UID KUIDT_INIT(1000)
-#define GLOBAL_SYSTEM_GID KGIDT_INIT(1000)
-extern const struct file_operations proc_static_ux_operations;
-#ifdef CONFIG_CAMERA_OPT
-extern const struct file_operations proc_camera_opt_operations;
-#endif
-extern bool is_special_entry(struct dentry *dentry, const char* special_proc);
-#endif /* OPLUS_FEATURE_UIFIRST */
+
 /* NOTE:
  *	Implementing inode permission operations in /proc is almost
  *	certainly an error.  Permission checks need to happen during
@@ -2005,13 +1997,6 @@ int pid_revalidate(struct dentry *dentry, unsigned int flags)
 		inode->i_mode &= ~(S_ISUID | S_ISGID);
 		security_task_to_inode(task, inode);
 		
-#ifdef OPLUS_FEATURE_UIFIRST
-		if (is_special_entry(dentry, "static_ux")) {
-			inode->i_uid = GLOBAL_SYSTEM_UID;
-			inode->i_gid = GLOBAL_SYSTEM_GID;
-		}
-#endif /* OPLUS_FEATURE_UIFIRST */
-		
 		put_task_struct(task);
 		return 1;
 	}
@@ -3670,9 +3655,6 @@ static const struct pid_entry tid_base_stuff[] = {
 #ifdef CONFIG_CPU_FREQ_TIMES
 	ONE("time_in_state", 0444, proc_time_in_state_show),
 #endif
-#ifdef OPLUS_FEATURE_UIFIRST
-	REG("static_ux", S_IRUGO | S_IWUGO, proc_static_ux_operations),
-#endif /* OPLUS_FEATURE_UIFIRST */
 };
 
 static int proc_tid_base_readdir(struct file *file, struct dir_context *ctx)
