@@ -807,7 +807,6 @@ ifdef CONFIG_LTO_CLANG
 ifdef CONFIG_THINLTO
 lto-clang-flags	:= -funified-lto
 lto-clang-flags	:= -flto=thin -fsplit-lto-unit
-KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod-prefix).thinlto-cache --lto-O3
 else
 lto-clang-flags	:= -flto
 endif
