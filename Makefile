@@ -797,6 +797,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, attribute-alias)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, default-const-init-field-unsafe)
 
 ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
 KBUILD_CFLAGS	+= $(call cc-option,-ffunction-sections,)
@@ -805,13 +806,15 @@ endif
 
 ifdef CONFIG_LTO_CLANG
 ifdef CONFIG_THINLTO
-lto-clang-flags	:= -funified-lto
-lto-clang-flags	:= -flto=thin -fsplit-lto-unit
-KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod-prefix).thinlto-cache --lto-O3
+lto-clang-flags	:= -flto=thin -fsplit-lto-unit $(call cc-option,-funified-lto)
+KBUILD_LDFLAGS	+= --thinlto-jobs=$(nproc --all)
+
+# LLVM tunings
+KBUILD_LDFLAGS += -mllvm -inline-threshold=500
 else
 lto-clang-flags	:= -flto
 endif
-lto-clang-flags += -fvisibility=default
+lto-clang-flags += -fvisibility=hidden
 
 # Limit inlining across translation units to reduce binary size
 LD_FLAGS_LTO_CLANG := --plugin-opt=-import-instr-limit=5 --plugin-opt=O3
@@ -824,6 +827,7 @@ KBUILD_LDFLAGS_MODULE += -T scripts/module-lto.lds
 # allow disabling only clang LTO where needed
 DISABLE_LTO_CLANG := -fno-lto
 export DISABLE_LTO_CLANG
+LDFLAGS		+= --plugin-opt=-import-instr-limit=5
 LTO_CFLAGS	:= $(lto-clang-flags)
 KBUILD_CFLAGS	+= $(LTO_CFLAGS)
 
@@ -872,6 +876,10 @@ endif
 
 ifdef CONFIG_CC_WERROR
 KBUILD_CFLAGS	+= -Werror
+endif
+
+ifdef CONFIG_LTO_CLANG
+KBUILD_CFLAG	+= -fwhole-program-vtables
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
