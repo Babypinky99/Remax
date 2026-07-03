@@ -55,6 +55,12 @@ extern void __chk_io_ptr(const volatile void __iomem *);
 #ifdef __KERNEL__
 
 /*
+ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-cleanup-variable-attribute
+ * clang: https://clang.llvm.org/docs/AttributeReference.html#cleanup
+ */
+#define __cleanup(func)			__attribute__((__cleanup__(func)))
+
+/*
  * Minimal backport of compiler_attributes.h to add support for __copy
  * to v4.9.y so that we can use it in init/exit_module to avoid
  * -Werror=missing-attributes errors on GCC 9.
