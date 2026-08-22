@@ -1,3 +1,6 @@
+ccflags-y += -I$(srctree)/drivers/kernelsu -I$(srctree)/drivers/kernelsu/include -I$(srctree)/fs
+subdir-ccflags-y += -I$(srctree)/drivers/kernelsu -I$(srctree)/drivers/kernelsu/include -I$(srctree)/fs
+
 kernelsu-objs := core/init.o
 
 kernelsu-objs += compat/kernel_compat.o
@@ -92,19 +95,19 @@ $(eval KSU_VERSION=$(shell expr 30000 + $(KSU_GIT_VERSION) + 200))
 $(info -- KernelSU-Next version: $(KSU_VERSION))
 ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 else
-	KSU_VERSION_FALLBACK := 33193
-	$(info -- KernelSU-Next version: $(KSU_VERSION_FALLBACK))
-	ccflags-y += -DKSU_VERSION=$(KSU_VERSION_FALLBACK)
+KSU_VERSION_FALLBACK := 33193
+$(info -- KernelSU-Next version: $(KSU_VERSION_FALLBACK))
+ccflags-y += -DKSU_VERSION=$(KSU_VERSION_FALLBACK)
 endif
 
 ifdef KSU_GIT_VERSION_VALID
-	$(eval KSU_VERSION_TAG=$(KSU_GIT_TAG))
-	$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG))
-	ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
+$(eval KSU_VERSION_TAG=$(KSU_GIT_TAG))
+$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG))
+ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
 else
-	KSU_VERSION_TAG_FALLBACK := v3.2.0-legacy
-	$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG_FALLBACK))
-	ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG_FALLBACK)\"
+KSU_VERSION_TAG_FALLBACK := v3.2.0-legacy
+$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG_FALLBACK))
+ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG_FALLBACK)\"
 endif
 
 ifndef KSU_NEXT_MANAGER_SIZE
@@ -303,5 +306,6 @@ ccflags-y += -DEXPECTED_MANAGER_HASH=\"$(KSU_NEXT_MANAGER_HASH)\"
 
 ccflags-y += -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat -Wno-missing-prototypes
 ccflags-y += -Wno-declaration-after-statement -Wno-unused-function -Wno-unused-variable
+ccflags-y += -I$(srctree)/fs
 
 # Keep a new line here!! Because someone may append config
