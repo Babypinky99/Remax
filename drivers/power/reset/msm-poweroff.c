@@ -350,23 +350,6 @@ static void msm_restart_prepare(const char *cmd)
 				(cmd != NULL && cmd[0] != '\0'));
 	}
 
-#ifdef OPLUS_BUG_STABILITY
-//Fanhong.Kong@PSW.BSP.CHG,add 2018/3/25 panic reboot reason as kernel for hotfix
-	if (in_panic){
-		//warm reset
-		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
-		qpnp_pon_set_restart_reason(
-					PON_RESTART_REASON_KERNEL);
-		flush_cache_all();
-
-		/*outer_flush_all is not supported by 64bit kernel*/
-#ifndef CONFIG_ARM64
-		outer_flush_all();
-#endif
-		return;
-	}
-#endif /* OPLUS_BUG_STABILITY */
-
 	if (force_warm_reboot)
 		pr_info("Forcing a warm reset of the system\n");
 
@@ -375,6 +358,14 @@ static void msm_restart_prepare(const char *cmd)
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
 	else
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_HARD_RESET);
+
+	if (in_panic) {
+		// Reboot to recovery
+		qpnp_pon_set_restart_reason(
+			PON_RESTART_REASON_RECOVERY);
+		__raw_writel(0x77665502, restart_reason);
+		goto finish_set_restart_reason;
+	}
 
 #ifndef VENDOR_EDIT
 /* OPLUS 2013.07.09 hewei modify begin for restart mode*/
@@ -515,6 +506,7 @@ static void msm_restart_prepare(const char *cmd)
 /* OPLUS 2013.07.09 hewei modify en for restart mode*/
 #endif //VENDOR_EDIT
 
+finish_set_restart_reason:
 	flush_cache_all();
 
 	/*outer_flush_all is not supported by 64bit kernel*/
